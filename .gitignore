@@ -1,0 +1,31 @@
+# System files
+.DS_Store
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+
+# Project Case Materials (Private)
+Case Material/
+Resume/
+*.pdf
+
+# Local configs and secrets
+.env
+.secrets.toml
+
+# Project artifacts and temp files
+output/
+test_*.py
+read_pdf.py
+inspect_data.py
+check_data_points.py
+verify_fmp_new.py
+
+# Editor
+.idea/
+.vscode/
