@@ -1,9 +1,9 @@
 streamlit
 pandas
-numpy
+numpy<2
 plotly
 requests
-pyportfolioopt
+pyportfolioopt>=1.5.0
 matplotlib
 seaborn
 scipy
