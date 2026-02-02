@@ -185,7 +185,7 @@ if st.session_state.get("run_analysis", False):
                             
                 st.divider()
 
-                col_opt1, col_opt2 = st.columns(2)
+                col_opt1, col_opt2, col_opt3 = st.columns(3)
                 
                 opt_weights = None
                 
@@ -209,14 +209,15 @@ if st.session_state.get("run_analysis", False):
                         except Exception as e:
                             st.error(f"Optimization failed: {e}")
 
-                if st.button("📈 Maximize Return (Target High Risk)"):
-                    try:
-                        opt_weights, perf = optimizer.optimize_max_return(fixed_weights=fixed_weights)
-                        st.success(f"Optimized! Return: {perf[0]:.2%}")
-                        st.metric("Expected Return", f"{perf[0]:.2%}")
-                        st.metric("Expected Volatility", f"{perf[1]:.2%}")
-                    except Exception as e:
-                        st.error(f"Optimization failed: {e}")
+                with col_opt3:
+                    if st.button("📈 Maximize Return"):
+                        try:
+                            opt_weights, perf = optimizer.optimize_max_return(fixed_weights=fixed_weights)
+                            st.success(f"Optimized! Return: {perf[0]:.2%}")
+                            st.metric("Expected Return", f"{perf[0]:.2%}")
+                            st.metric("Expected Volatility", f"{perf[1]:.2%}")
+                        except Exception as e:
+                            st.error(f"Optimization failed: {e}")
                             
                 if opt_weights:
                     st.markdown("### Optimized Allocation")
