@@ -3,8 +3,6 @@ import numpy as np
 from pypfopt import EfficientFrontier
 from pypfopt import risk_models
 from pypfopt import expected_returns
-from pypfopt.plotting import plot_efficient_frontier
-import matplotlib.pyplot as plt
 
 class PortfolioOptimizer:
     def __init__(self, price_data: pd.DataFrame, risk_free_rate: float = 0.04):
