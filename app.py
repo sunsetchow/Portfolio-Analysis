@@ -69,7 +69,8 @@ for i, asset in enumerate(st.session_state.portfolio):
         asset["ticker"] = st.session_state[f"ticker_{i}"].upper()
     with cols[1]:
         # Widget handles state via 'key'
-        st.number_input(f"Weight", key=f"weight_{i}", step=0.05)
+        # Widget handles state via 'key'
+        st.number_input(f"Value ($)", key=f"weight_{i}", step=100.0)
         # Read updated value from state
         asset["weight"] = st.session_state[f"weight_{i}"]
     with cols[2]:
@@ -85,16 +86,18 @@ if st.sidebar.button("➕ Add Asset"):
     st.rerun()
 
 # Normalize Weights Button
-st.sidebar.button("Normalize Weights to 100%", on_click=normalize_weights)
+st.sidebar.button("Convert to % Weights", on_click=normalize_weights, help="Click to convert dollar values into percentage weights.")
 
 # Processing
 tickers = [item["ticker"] for item in st.session_state.portfolio]
 weights = {item["ticker"]: item["weight"] for item in st.session_state.portfolio}
 
 total_weight = sum(weights.values())
-st.sidebar.markdown(f"**Total Allocation:** {total_weight:.1%}")
+gross_exposure = sum(abs(w) for w in weights.values())
+st.sidebar.markdown(f"**Net Allocation:** {total_weight:.1%}")
+st.sidebar.markdown(f"**Gross Exposure:** {gross_exposure:.1%}")
 
-if total_weight == 0:
+if gross_exposure == 0:
     st.error("Total allocation is 0%. Please add weights.")
     st.stop()
 
@@ -166,7 +169,22 @@ if st.session_state.get("run_analysis", False):
                 st.subheader("Mean-Variance Optimization")
                 
                 optimizer = PortfolioOptimizer(prices)
+    
+                st.markdown("##### Constraints")
+                fixed_weights = {}
                 
+                # Create checkboxes for locking weights
+                c_cols = st.columns(3)
+                for i, asset in enumerate(st.session_state.portfolio):
+                    ticker = asset["ticker"]
+                    w = asset["weight"]
+                    # Distribute across columns
+                    with c_cols[i % 3]:
+                        if st.checkbox(f"Lock {ticker} @ {w:.0%}", key=f"lock_{ticker}_{i}"):
+                            fixed_weights[ticker] = w
+                            
+                st.divider()
+
                 col_opt1, col_opt2 = st.columns(2)
                 
                 opt_weights = None
@@ -174,7 +192,7 @@ if st.session_state.get("run_analysis", False):
                 with col_opt1:
                     if st.button("🚀 Maximize Sharpe Ratio"):
                         try:
-                            opt_weights, perf = optimizer.optimize_max_sharpe()
+                            opt_weights, perf = optimizer.optimize_max_sharpe(fixed_weights=fixed_weights)
                             st.success(f"Optimized! Sharpe: {perf[2]:.2f}")
                             st.metric("Expected Return", f"{perf[0]:.2%}")
                             st.metric("Expected Volatility", f"{perf[1]:.2%}")
@@ -184,7 +202,7 @@ if st.session_state.get("run_analysis", False):
                 with col_opt2:
                     if st.button("🛡️ Minimize Volatility"):
                         try:
-                            opt_weights, perf = optimizer.optimize_min_volatility()
+                            opt_weights, perf = optimizer.optimize_min_volatility(fixed_weights=fixed_weights)
                             st.success(f"Optimized! Volatility: {perf[1]:.2%}")
                             st.metric("Expected Return", f"{perf[0]:.2%}")
                             st.metric("Expected Volatility", f"{perf[1]:.2%}")
@@ -193,7 +211,7 @@ if st.session_state.get("run_analysis", False):
 
                 if st.button("📈 Maximize Return (Target High Risk)"):
                     try:
-                        opt_weights, perf = optimizer.optimize_max_return()
+                        opt_weights, perf = optimizer.optimize_max_return(fixed_weights=fixed_weights)
                         st.success(f"Optimized! Return: {perf[0]:.2%}")
                         st.metric("Expected Return", f"{perf[0]:.2%}")
                         st.metric("Expected Volatility", f"{perf[1]:.2%}")
