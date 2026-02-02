@@ -13,6 +13,9 @@ env/
 Case Material/
 Resume/
 *.pdf
+Draft Idea.md
+0_CIPCC Plan.md
+Resources.md
 
 # Local configs and secrets
 .env
