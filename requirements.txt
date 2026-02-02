@@ -6,3 +6,5 @@ requests
 pyportfolioopt
 matplotlib
 seaborn
+scipy
+cvxpy
