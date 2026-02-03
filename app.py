@@ -70,7 +70,7 @@ for i, asset in enumerate(st.session_state.portfolio):
     with cols[1]:
         # Widget handles state via 'key'
         # Widget handles state via 'key'
-        st.number_input(f"Value ($)", key=f"weight_{i}", step=100.0)
+        st.number_input(f"Weight", key=f"weight_{i}", step=0.05)
         # Read updated value from state
         asset["weight"] = st.session_state[f"weight_{i}"]
     with cols[2]:
@@ -86,7 +86,7 @@ if st.sidebar.button("➕ Add Asset"):
     st.rerun()
 
 # Normalize Weights Button
-st.sidebar.button("Convert to % Weights", on_click=normalize_weights, help="Click to convert dollar values into percentage weights.")
+st.sidebar.button("Normalize Weights to 100%", on_click=normalize_weights)
 
 # Processing
 tickers = [item["ticker"] for item in st.session_state.portfolio]
